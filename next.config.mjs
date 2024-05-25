@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
-export default nextConfig;
+const nextConfig = {
+    env: {
+      ALCHEMY_URL: process.env.ALCHEMY_URL,
+    },
+  };
+  
+  export default nextConfig;
