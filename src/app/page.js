@@ -6,6 +6,9 @@ config();import { ethers } from 'ethers';
 import { contract } from './contract.js';
 import axios from 'axios';
 
+
+
+
 const HomePage = () => {
   const [driverAddress, setDriverAddress] = useState('');
   const [originAddress, setOriginAddress] = useState('');
@@ -38,6 +41,9 @@ const HomePage = () => {
       console.error(err);
     }
   };
+
+  
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -91,7 +97,7 @@ const HomePage = () => {
       console.log("Completing drive with the following details:");
       console.log("Rider Address:", signer);
       console.log("Send Value:", sendValue.toString());
-      await smartContract.completeDrive(1, sendValue); // Call completeDrive function
+      await smartContract.completeDrive(1); // Call completeDrive function
       console.log("Drive completed successfully!");
     } catch (err) {
       console.error("Error completing drive:", err);
