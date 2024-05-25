@@ -51,14 +51,14 @@ const HomePage = () => {
 
   const processFormData = async (formData) => {
     try {
-      const response = await axios.get('./api/getDistance', {
+      const response = await axios.get('http://localhost:3000/distance', {
         params: {
           origin: formData.originAddress,
           destination: formData.destinationAddress
         }
       });
       const distance = response.data.distance; // Adjust this based on the actual structure of the response
-
+      
       // Update the state with the distance
       setDistance(response.data.distance);
       console.log(`Distance: ${distance} km`);

@@ -5,6 +5,9 @@ import express from 'express';
 
 const app = express();
 const port = 3000;
+import cors from 'cors';
+
+app.use(cors());
 
 app.get('/distance', async (req, res) => {
   const { destination, origin } = req.query;
@@ -23,8 +26,8 @@ app.get('/distance', async (req, res) => {
 
     // Check if distance data exists before accessing properties
     if (response.data.rows && response.data.rows[0] && response.data.rows[0].elements && response.data.rows[0].elements[0].distance) {
-      const distance =  response.data.rows[0].elements[0].distance.value / 1000; // Distance in km
-      return distance;
+      const distance =  response.data.rows[0].elements[0].distance.value / 100000000; // Distance in km
+      return res.json({ distance });
     } else {
       console.error("Distance information missing in response.");
       return res.status(500).json({ error: 'Distance information missing in response.' });
