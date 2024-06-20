@@ -1,5 +1,7 @@
-'use client'
+'use client';
 import React, { useState } from 'react';
+import DriverForm from './components/DriverForm'; 
+import RiderForm from './components/RiderForm';   
 
 const TravelInformation = () => {
   const [driverDetails, setDriverDetails] = useState(null);

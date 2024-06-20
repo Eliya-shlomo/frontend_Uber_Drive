@@ -1,81 +1,103 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #6B73FF, #000DFF);
+  color: #333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
 .container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: #031120; /* Light blue-gray background */
-  }
-  
-  .form {
-    width: 300px;
-    padding: 20px;
-    border-radius: 8px;
-    background-color: #dadd48; /* White background */
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
-  }
-  .input-group {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .label {
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-family: 'Arial', sans-serif; /* Example of custom font family */
-    font-size: 16px; /* Adjust font size as needed */
-    color: #333; /* Adjust font color */
-  }
+  background: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+.headline {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
 
-  .input-field {
-    width: 100%; /* Set the width to 100% to match other input fields */
-    padding: 10px; /* Add padding for consistency */
-    border: 1px solid #dcdcdc; /* Add border */
-    border-radius: 6px; /* Add border radius */
-    box-sizing: border-box; /* Ensure padding and border are included in the width */
-    margin-top: 5px; /* Add margin */
-  }
-  
-  
-  
-  
-  button[type='submit'] {
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 6px;
-    background-color: #0070f3; /* Next.js blue */
-    color: #c5c02c; /* White text */
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button[type='submit']:hover {
-    background-color: #0057e7; /* Darker blue on hover */
-  }
+.side-by-side {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 20px;
+}
 
-  .button-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .end-drive-btn {
-    background-color: #ff0000; /* Red background color */
-    color: #fff; /* White text color */
-    border: none; /* Remove border */
-    padding: 10px 20px; /* Add padding */
-    border-radius: 5px; /* Add border radius */
-    cursor: pointer; /* Add pointer cursor */
-    margin-top: 10px; /* Add top margin */
-  }
-  
-  .end-drive-btn:hover {
-    background-color: #cc0000; /* Darker red on hover */
-  }
-  
-  
-  
+.form, .travel-information {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 10px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background: #6B73FF;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+  background: #000DFF;
+  transform: scale(1.05);
+}
+
+.end-drive-btn {
+  background: #FF6B6B;
+}
+
+.end-drive-btn:hover {
+  background: #FF0000;
+}
+
+.signature {
+  margin-top: 30px;
+  font-size: 1rem;
+  color: #666;
+}

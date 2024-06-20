@@ -2,6 +2,7 @@ import axios from 'axios';
 import { config } from 'dotenv';
 config();
 import express from 'express';
+import { API_KEY } from '../../../config.js'
 
 const app = express();
 const port = 3000;
@@ -17,14 +18,12 @@ app.get('/distance', async (req, res) => {
   }
 
   try {
-    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=AIzaSyDz1TeVVi6-DGDXEJU2hq3QDZhAZnzDDdM`;
+    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=${API_KEY}`;
   
     const response = await axios.get(apiUrl);
 
-    // Log the entire API response
     console.log("API Response:", response.data);
 
-    // Check if distance data exists before accessing properties
     if (response.data.rows && response.data.rows[0] && response.data.rows[0].elements && response.data.rows[0].elements[0].distance) {
       const distance =  response.data.rows[0].elements[0].distance.value / 100000000; // Distance in km
       return res.json({ distance });
