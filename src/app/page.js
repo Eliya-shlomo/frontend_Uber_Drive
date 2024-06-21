@@ -156,27 +156,32 @@ const HomePage = () => {
 
   const completeDrive = async () => {
     try {
-      console.log("Completing drive with the following details:");
-      await smartContract.completeDrive(DriverAddress, { nonce: await provider.getTransactionCount(RiderWallet.address, 'latest') });
-      setNonce(prevNonce => prevNonce + 1);  // Increment nonce after using it
-      console.log("Drive completed successfully!");
-      
-      const rideCost = ethers.parseEther(distance.toString()); 
-      const gasFee = ethers.parseUnits('4', 'gwei') * 3000000;
+        console.log("Completing drive with the following details:");
+        
+        await smartContract.completeDrive(DriverAddress, { 
+            nonce: await provider.getTransactionCount(RiderWallet.address, 'latest') 
+        });
+        setNonce(prevNonce => prevNonce + 1);  
+        console.log("Drive completed successfully!");
+        
+        const rideCost = ethers.parseEther(distance.toString()); 
+        const gasLimit = BigInt(3000000);
+        const gasPrice = ethers.parseUnits('4', 'gwei');
+        const gasFee = gasLimit * BigInt(gasPrice);
 
-      setRideCost(ethers.formatEther(rideCost));
-      setGasFee(ethers.formatUnits(gasFee, 'gwei'));
+        setRideCost(ethers.formatEther(rideCost));
+        setGasFee(ethers.formatUnits(gasFee, 'gwei'));
 
-      setIsDriveEnded(true);
+        setIsDriveEnded(true);
 
-      const balance = await provider.getBalance(RiderAddress);
-      const formattedBalance = ethers.formatEther(balance);
-      console.log(`Your ETH balance: ${formattedBalance} ETH`);
+        const balance = await provider.getBalance(RiderAddress);
+        const formattedBalance = ethers.formatEther(balance);
+        console.log(`Your ETH balance: ${formattedBalance} ETH`);
     } catch (err) {
-      console.error("Error completing drive:", err);
-      alert("Error completing drive");
+        console.error("Error completing drive:", err);
+        alert("Error completing drive");
     }
-  };
+};
 
   const handleEndDrive = () => {
     completeDrive();
