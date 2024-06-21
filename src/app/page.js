@@ -43,7 +43,7 @@ const HomePage = () => {
     try {
       const riderWallet = new ethers.Wallet(RiderPrivateKey, provider);
       setRiderWallet(riderWallet);
-      const currentNonce = await provider.getTransactionCount(riderWallet.address);
+      const currentNonce = await provider.getTransactionCount(riderWallet.address, 'latest');
       setNonce(currentNonce);
       console.log("Nonce when initialized:", currentNonce);
 
@@ -83,16 +83,18 @@ const HomePage = () => {
       const overrides = {
         gasLimit: 3000000,
         gasPrice: ethers.parseUnits('4', 'gwei'),
-        nonce: nonce,
+        nonce: await provider.getTransactionCount(RiderWallet.address, 'latest'),
       };
       console.log("Deploying contract...");
       const smartContract = await SmartContractFactory.deploy(RiderAddress, DriverAddress, overrides);
-      await smartContract.deployed();
+      await smartContract.waitForDeployment();
       setNonce(prevNonce => prevNonce + 1);  // Increment nonce after using it
       console.log('Contract deployed at address:', smartContract.address);
       setSmartContract(smartContract);
+      return smartContract;  // Return the smart contract instance
     } catch (error) {
       console.error('Error deploying contract:', error);
+      throw error;  // Re-throw the error to handle it in handleSubmit
     }
   };
 
@@ -107,9 +109,13 @@ const HomePage = () => {
 
     // Ensure SmartContractFactory is set before proceeding
     if (SmartContractFactory) {
-      await MakeContractInstance();
-      console.log("Smart Contract Factory created");
-      await bookDrive();
+      try {
+        const contractInstance = await MakeContractInstance();
+        console.log("Smart Contract Factory created");
+        await bookDrive(contractInstance);
+      } catch (error) {
+        console.error("Error creating contract instance:", error);
+      }
     } else {
       console.error("SmartContractFactory was not created successfully");
     }
@@ -131,7 +137,7 @@ const HomePage = () => {
     }
   };
 
-  const bookDrive = async () => {
+  const bookDrive = async (contractInstance) => {
     try {
       const sendValue = ethers.parseEther(distance.toString()); 
       console.log("Booking drive with the following details:");
@@ -139,7 +145,7 @@ const HomePage = () => {
       console.log("Rider Address:", RiderAddress);
       console.log("Send Value:", sendValue.toString());
 
-      await smartContract.bookDrive(DriverAddress, { value: sendValue, nonce: nonce });
+      await contractInstance.bookDrive(DriverAddress, { value: sendValue, nonce: await provider.getTransactionCount(RiderWallet.address, 'latest') });
       setNonce(prevNonce => prevNonce + 1);  // Increment nonce after using it
       console.log("Drive booked successfully!");
     } catch (err) {
@@ -151,7 +157,7 @@ const HomePage = () => {
   const completeDrive = async () => {
     try {
       console.log("Completing drive with the following details:");
-      await smartContract.completeDrive(DriverAddress, { nonce: nonce });
+      await smartContract.completeDrive(DriverAddress, { nonce: await provider.getTransactionCount(RiderWallet.address, 'latest') });
       setNonce(prevNonce => prevNonce + 1);  // Increment nonce after using it
       console.log("Drive completed successfully!");
       
