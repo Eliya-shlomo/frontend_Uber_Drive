@@ -1,8 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import './page.css'; 
-import { config } from 'dotenv';
-config();
 import { ethers } from 'ethers';
 import contract from './contract.json';
 import axios from 'axios';
@@ -11,14 +9,14 @@ const HomePage = () => {
   const abi = contract.abi;
   const bytecode = contract.bytecode;
 
-  const [SmartContractFactory, setSmartContractFactory] = useState('');
+  const [SmartContractFactory, setSmartContractFactory] = useState(null);
   const [RiderPrivateKey, setRiderPrivateKey] = useState('');
   const [RiderAddress, setRiderAddress] = useState('');
   const [DriverAddress, setDriverAddress] = useState('');
   const [originAddress, setOriginAddress] = useState('');
   const [destinationAddress, setDestinationAddress] = useState('');
-  const [signer, setSigner] = useState();
-  const [provider, setProvider] = useState();
+  const [signer, setSigner] = useState(null);
+  const [provider, setProvider] = useState(null);
   const [distance, setDistance] = useState(null);
   const [smartContract, setSmartContract] = useState(null); 
   const [Nonce, setNonce] = useState(0);
@@ -28,79 +26,69 @@ const HomePage = () => {
   const [isDriveEnded, setIsDriveEnded] = useState(false);
 
   useEffect(() => {
-    connectToMetamask(); 
+    connectToProvider(); 
   }, []);
 
-  const connectToMetamask = async () => {
+  const connectToProvider = async () => {
     try {
       const provider = new ethers.WebSocketProvider("wss://eth-sepolia.g.alchemy.com/v2/VJ3P4EvkGue0YoBdA5D57iQpULsTC5rg");
       setProvider(provider);
-      const signer = await provider.getSigner();
-      setSigner(signer);
-      console.log("Account:", await signer.getAddress());
+      console.log("Connected to provider");
     } catch (err) {
-      console.error(err);
+      console.error("Error connecting to provider:", err);
     }
   };
 
-  const MakeRiderWallet = async() => {
+  const MakeRiderWallet = async () => {
     try {
-      const Riderwallet = new ethers.Wallet(RiderPrivateKey,provider);
-      setRiderWallet(Riderwallet);
+      const riderWallet = new ethers.Wallet(RiderPrivateKey, provider);
+      setRiderWallet(riderWallet);
     } catch (error) {
-      console.error(error);
+      console.error("Error creating Rider Wallet:", error);
     }
-  }
+  };
 
   const MakeContractFactory = async () => {
     try {
-      console.log("trying make a wallet");
-      MakeRiderWallet();
-      console.log("success making a wallet");
-      console.log("trying make a Smart Contract Factory");
-      const SmartContractFactory =  new ethers.ContractFactory(
-        abi,
-        bytecode,
-        RiderWallet
-      );
-      console.log("success making a Smart Contract Factory");
-      setSmartContractFactory(SmartContractFactory);
+      console.log("Creating Smart Contract Factory");
+      await MakeRiderWallet();  
+
+      const smartContractFactory = new ethers.ContractFactory(abi, bytecode, RiderWallet);
+      setSmartContractFactory(smartContractFactory);
+      console.log("Smart Contract Factory created");
     } catch (error) {
-      console.log(error);
+      console.error("Error creating Smart Contract Factory:", error);
     }
-  }
+  };
 
   const MakeContractInstance = async () => {
     try {
-      await GetNonce(); 
+      await GetNonce();
       const overrides = {
         gasLimit: 3000000,
         gasPrice: ethers.parseUnits('4', 'gwei'),
         nonce: Nonce,
       };
-      await GetNonce(); 
       console.log("Deploying contract...");
       const smartContract = await SmartContractFactory.deploy(RiderAddress, DriverAddress, overrides);
-      await smartContract.deploymentTransaction().wait(2); 
+      await smartContract.deployed();
       console.log('Contract deployed at address:', smartContract.address);
       setSmartContract(smartContract);
     } catch (error) {
       console.error('Error deploying contract:', error);
-      return null;
     }
   };
 
-  const GetNonce = async() => {
+  const GetNonce = async () => {
     try {
-      console.log("trying getting nonce");
-      const newNonce = Nonce + 1;
-      console.log("success getting Nonce");
-      setNonce(newNonce);
-      console.log("Nonce value is:" , Nonce);
+      console.log("Getting nonce");
+      const nonce = await provider.getTransactionCount(RiderAddress);
+      setNonce(nonce);
+      console.log("Nonce value is:", nonce);
     } catch (error) {
-      console.log(error);
+      console.error("Error getting nonce:", error);
     }
-  }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -108,11 +96,11 @@ const HomePage = () => {
       originAddress,
       destinationAddress
     });
-    console.log("Trying make Factory");
-    MakeContractFactory();
-    MakeContractInstance();
-    console.log("success making Factory");
-    bookDrive();
+    console.log("Creating Smart Contract Factory");
+    await MakeContractFactory();
+    await MakeContractInstance();
+    console.log("Smart Contract Factory created");
+    await bookDrive();
   };
 
   const processFormData = async (formData) => {
@@ -140,7 +128,7 @@ const HomePage = () => {
       console.log("Rider Address:", RiderAddress);
       console.log("Send Value:", sendValue.toString());
 
-      await smartContract.bookDrive(DriverAddress,{value : sendValue , nonce: Nonce }); 
+      await smartContract.bookDrive(DriverAddress, { value: sendValue, nonce: Nonce });
       console.log("Drive booked successfully!");
     } catch (err) {
       console.error("Error booking drive:", err);
@@ -152,10 +140,9 @@ const HomePage = () => {
     try {
       await GetNonce();
       console.log("Completing drive with the following details:");
-      await smartContract.completeDrive(DriverAddress , {nonce: Nonce}); 
+      await smartContract.completeDrive(DriverAddress, { nonce: Nonce });
       console.log("Drive completed successfully!");
       
-      // Calculate the ride cost and gas fee
       const rideCost = ethers.parseEther(distance.toString()); 
       const gasFee = ethers.parseUnits('4', 'gwei') * 3000000;
 
@@ -164,7 +151,7 @@ const HomePage = () => {
 
       setIsDriveEnded(true);
 
-      const balance = await provider.getBalance('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266');
+      const balance = await provider.getBalance(RiderAddress);
       const formattedBalance = ethers.formatEther(balance);
       console.log(`Your ETH balance: ${formattedBalance} ETH`);
     } catch (err) {
