@@ -6,7 +6,6 @@ config();
 import { ethers } from 'ethers';
 import contract from './contract.json';
 import axios from 'axios';
-import TravelInformation from './travelInformation.js'; 
 
 const HomePage = () => {
   const abi = contract.abi;
@@ -24,6 +23,9 @@ const HomePage = () => {
   const [smartContract, setSmartContract] = useState(null); 
   const [Nonce, setNonce] = useState(0);
   const [RiderWallet, setRiderWallet] = useState(null);
+  const [rideCost, setRideCost] = useState(null);
+  const [gasFee, setGasFee] = useState(null);
+  const [isDriveEnded, setIsDriveEnded] = useState(false);
 
   useEffect(() => {
     connectToMetamask(); 
@@ -152,6 +154,16 @@ const HomePage = () => {
       console.log("Completing drive with the following details:");
       await smartContract.completeDrive(DriverAddress , {nonce: Nonce}); 
       console.log("Drive completed successfully!");
+      
+      // Calculate the ride cost and gas fee
+      const rideCost = ethers.parseEther(distance.toString()); 
+      const gasFee = ethers.parseUnits('4', 'gwei') * 3000000;
+
+      setRideCost(ethers.formatEther(rideCost));
+      setGasFee(ethers.formatUnits(gasFee, 'gwei'));
+
+      setIsDriveEnded(true);
+
       const balance = await provider.getBalance('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266');
       const formattedBalance = ethers.formatEther(balance);
       console.log(`Your ETH balance: ${formattedBalance} ETH`);
@@ -170,60 +182,74 @@ const HomePage = () => {
     <div className="container">
       <h1 className="headline">UberDrive - Escrow Contract</h1>
       <div className="side-by-side">
-        <div className="travel-information">
-          <TravelInformation />
+        <div className="box">
+          <h2>Recipe</h2>
+          {isDriveEnded ? (
+            <div>
+              <p><strong>Driver Address:</strong> {DriverAddress}</p>
+              <p><strong>Rider Address:</strong> {RiderAddress}</p>
+              <p><strong>Ride Cost:</strong> {rideCost} ETH</p>
+              <p><strong>Gas Fee:</strong> {gasFee} Gwei</p>
+            </div>
+          ) : (
+            <div style={{ marginTop: 'auto' }}>
+              <p>No ride details available. Please complete a ride first.</p>
+            </div>
+          )}
         </div>
-        <form className="form" onSubmit={handleSubmit}>
-          <div className="input-group">
-            <label>RIDER WALLET ADDRESS</label>
-            <input
-              type="text"
-              value={RiderAddress}
-              onChange={(e) => setRiderAddress(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label>RIDER PRIVATE KEY</label>
-            <input
-              type="password"
-              value={RiderPrivateKey}
-              onChange={(e) => setRiderPrivateKey(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label>DRIVER WALLET ADDRESS</label>
-            <input
-              type="text"
-              value={DriverAddress}
-              onChange={(e) => setDriverAddress(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label>WHERE I AM</label>
-            <input
-              type="text"
-              value={originAddress}
-              onChange={(e) => setOriginAddress(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label>WHERE I WANT TO GO</label>
-            <input
-              type="text"
-              value={destinationAddress}
-              onChange={(e) => setDestinationAddress(e.target.value)}
-              required
-            />
-          </div>
-          <div className="button-group">
-            <button type="submit">START DRIVE</button>
-            <button type="button" className="end-drive-btn" onClick={handleEndDrive}>END DRIVE</button>
-          </div>
-        </form>
+        <div className="box">
+          <form className="form" onSubmit={handleSubmit}>
+            <div className="input-group">
+              <label>RIDER WALLET ADDRESS</label>
+              <input
+                type="text"
+                value={RiderAddress}
+                onChange={(e) => setRiderAddress(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>RIDER PRIVATE KEY</label>
+              <input
+                type="password"
+                value={RiderPrivateKey}
+                onChange={(e) => setRiderPrivateKey(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>DRIVER WALLET ADDRESS</label>
+              <input
+                type="text"
+                value={DriverAddress}
+                onChange={(e) => setDriverAddress(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>WHERE I AM</label>
+              <input
+                type="text"
+                value={originAddress}
+                onChange={(e) => setOriginAddress(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-group">
+              <label>WHERE I WANT TO GO</label>
+              <input
+                type="text"
+                value={destinationAddress}
+                onChange={(e) => setDestinationAddress(e.target.value)}
+                required
+              />
+            </div>
+            <div className="button-group">
+              <button type="submit">START DRIVE</button>
+              <button type="button" className="end-drive-btn" onClick={handleEndDrive}>END DRIVE</button>
+            </div>
+          </form>
+        </div>
       </div>
       <div className="signature">© 2024 Eliya Shlomo</div>
     </div>
