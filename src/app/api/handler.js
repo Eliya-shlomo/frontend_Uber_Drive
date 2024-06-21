@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { config } from 'dotenv';
-config();
 import express from 'express';
-import { API_KEY } from '../../../config.js'
+config(); 
+const apiKey = process.env.API_KEY;
 
 const app = express();
 const port = 3000;
@@ -18,7 +18,7 @@ app.get('/distance', async (req, res) => {
   }
 
   try {
-    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=${API_KEY}`;
+    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=${apiKey}`;
   
     const response = await axios.get(apiUrl);
 
