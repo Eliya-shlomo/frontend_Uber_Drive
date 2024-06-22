@@ -2,12 +2,13 @@ import axios from 'axios';
 import { config } from 'dotenv';
 config(); 
 const apiKey = process.env.API_KEY;
+const APIKEY='AIzaSyBMLodS1UobbB15ZExGXoHosoGhGvDTD5I';
 
 
 
 export async function getDistance(origin, destination) {
     try {
-        const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=${apiKey}`;
+        const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=${APIKEY}`;
 
         const response = await axios.get(apiUrl);
 
