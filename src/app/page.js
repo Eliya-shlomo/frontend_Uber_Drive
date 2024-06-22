@@ -123,7 +123,7 @@ const HomePage = () => {
 
   const processFormData = async (formData) => {
     try {
-      const response = await axios.get('http://localhost:3000/distance', {
+      const response = await axios.get('/api/distance', { 
         params: {
           origin: formData.originAddress,
           destination: formData.destinationAddress
