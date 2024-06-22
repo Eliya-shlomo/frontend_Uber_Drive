@@ -24,6 +24,7 @@ const HomePage = () => {
   const [rideCost, setRideCost] = useState(null);
   const [gasFee, setGasFee] = useState(null);
   const [isDriveEnded, setIsDriveEnded] = useState(false);
+  const [successMessage, setSuccessMessage] = useState(''); // Add state variable for success message
 
   useEffect(() => {
     connectToProvider(); 
@@ -88,10 +89,10 @@ const HomePage = () => {
       console.log("Deploying contract...");
       const smartContract = await SmartContractFactory.deploy(RiderAddress, DriverAddress, overrides);
       await smartContract.waitForDeployment();
-      setNonce(prevNonce => prevNonce + 1);  // Increment nonce after using it
+      setNonce(prevNonce => prevNonce + 1); 
       console.log('Contract deployed at address:', smartContract.address);
       setSmartContract(smartContract);
-      return smartContract;  // Return the smart contract instance
+      return smartContract;  
     } catch (error) {
       console.error('Error deploying contract:', error);
       throw error;  // Re-throw the error to handle it in handleSubmit
@@ -147,6 +148,7 @@ const HomePage = () => {
 
       await contractInstance.bookDrive(DriverAddress, { value: sendValue, nonce: await provider.getTransactionCount(RiderWallet.address, 'latest') });
       setNonce(prevNonce => prevNonce + 1);  // Increment nonce after using it
+      setSuccessMessage('Drive booked successfully!'); // Update success message
       console.log("Drive booked successfully!");
     } catch (err) {
       console.error("Error booking drive:", err);
@@ -177,6 +179,7 @@ const HomePage = () => {
         const balance = await provider.getBalance(RiderAddress);
         const formattedBalance = ethers.formatEther(balance);
         console.log(`Your ETH balance: ${formattedBalance} ETH`);
+        setSuccessMessage('Drive completed successfully!'); // Update success message
     } catch (err) {
         console.error("Error completing drive:", err);
         alert("Error completing drive");
@@ -206,6 +209,7 @@ const HomePage = () => {
               <p>No ride details available. Please complete a ride first.</p>
             </div>
           )}
+          {successMessage && <p className="success-message">{successMessage}</p>} {/* Display success message */}
         </div>
         <div className="box">
           <form className="form" onSubmit={handleSubmit}>

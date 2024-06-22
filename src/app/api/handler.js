@@ -3,7 +3,6 @@ import { config } from 'dotenv';
 import express from 'express';
 config(); 
 const apiKey = process.env.API_KEY;
-const APIKEY='AIzaSyBMLodS1UobbB15ZExGXoHosoGhGvDTD5I';
 const app = express();
 const port = 3000;
 import cors from 'cors';
@@ -18,7 +17,7 @@ app.get('/distance', async (req, res) => {
   }
 
   try {
-    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=${APIKEY}`;
+    const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?destinations=${destination}&origins=${origin}&key=${apiKey}`;
   
     const response = await axios.get(apiUrl);
 
